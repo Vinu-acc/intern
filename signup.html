@@ -1,0 +1,223 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Smart Personal Organizer</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #6b5b9a, #d2c8e3); /* Original purple gradient */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative; /* For positioning ears */
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 60px; /* Increased padding for more height */
+            width: 300px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 1s ease-in-out;
+            position: relative; /* Allow positioning of eyes */
+            transition: transform 0.3s, border-radius 0.3s; /* Smooth movement for the container */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #6b5b9a; /* Darker original purple */
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s; /* Smooth movement and background */
+        }
+
+        button:hover {
+            background-color: #4e3e78; /* Darker purple on hover */
+            transform: translateY(-2px); /* Lift effect on hover */
+        }
+
+        .switch {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .switch a {
+            color: #d2c8e3; /* Lighter original purple for links */
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Eye styles */
+        .eye {
+            position: absolute;
+            width: 80px; /* Eye size */
+            height: 80px; /* Eye size */
+            background: black;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: -40px; /* Positioned inside the container */
+            transition: transform 0.2s; /* Smooth movement */
+        }
+
+        .pupil {
+            width: 30px; /* Pupil size */
+            height: 30px; /* Pupil size */
+            background: white; /* Pupil color */
+            border-radius: 50%;
+            transition: transform 0.2s; /* Smooth movement for pupil */
+        }
+
+        /* Ear styles */
+        .ear {
+            position: absolute;
+            width: 40px; /* Ear size */
+            height: 20px; /* Ear size */
+            background: black; /* Ear color */
+            border-radius: 20px; /* U-shape */
+            top: -20px; /* Positioning above the container */
+        }
+
+        .left-ear {
+            left: 10%; /* Adjust left ear position */
+            transform: rotate(-45deg); /* Tilt left ear */
+        }
+
+        .right-ear {
+            right: 10%; /* Adjust right ear position */
+            transform: rotate(45deg); /* Tilt right ear */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Sign Up</h1>
+        <form id="signup-form">
+            <input type="text" id="signup-username" placeholder="Username" required>
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <button type="submit">Sign Up</button>
+        </form>
+        <div class="switch">
+            <p>Already have an account? <a href="login.html">Login</a></p>
+        </div>
+
+        <!-- Eyes positioned inside the container -->
+        <div class="eye" style="left: 15%;">
+            <div class="pupil"></div>
+        </div>
+        <div class="eye" style="right: 15%;">
+            <div class="pupil"></div>
+        </div>
+    </div>
+
+    <!-- Ears positioned above the container -->
+    <div class="ear left-ear"></div>
+    <div class="ear right-ear"></div>
+
+    <script>
+        const signupForm = document.getElementById('signup-form');
+    
+        signupForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+    
+            try {
+                const response = await signup(username, email, password);
+                console.log(response); // Log success message from server
+                alert(response); // Alert user about success
+                window.location.href = 'login.html'; // Redirect to the login page after signup
+            } catch (error) {
+                console.error('Signup failed:', error);
+                alert('Signup failed: ' + error.message); // Alert user about the failure
+            }
+        });
+    
+        async function signup(username, email, password) {
+            const response = await fetch('http://127.0.0.1:5000/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password }),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error);
+            }
+    
+            const data = await response.json();
+            return data.message; // Return success message
+        }
+    
+        const eyes = document.querySelectorAll('.eye');
+        const pupils = document.querySelectorAll('.pupil');
+        const container = document.querySelector('.container');
+    
+        document.addEventListener('mousemove', (e) => {
+            eyes.forEach((eye, index) => {
+                const { top, left } = eye.getBoundingClientRect();
+                const eyeCenterX = left + eye.offsetWidth / 2;
+                const eyeCenterY = top + eye.offsetHeight / 2;
+    
+                const deltaX = e.clientX - eyeCenterX;
+                const deltaY = e.clientY - eyeCenterY;
+    
+                const angle = Math.atan2(deltaY, deltaX);
+                const distance = Math.min(10, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
+                
+                eye.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+    
+                // Move pupil
+                const pupilDistance = Math.min(15, distance); // Slightly further for pupil movement
+                pupils[index].style.transform = `translate(${Math.cos(angle) * pupilDistance}px, ${Math.sin(angle) * pupilDistance}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
